@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>🧠 轻量MBTI · 性格探测器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background: linear-gradient(145deg, #f0f4fa 0%, #e6ecf5 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+    .test-card {
+      max-width: 820px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 20, 40, 0.35), 
+                  inset 0 1px 2px rgba(255,255,255,0.6);
+      padding: 2rem 1.8rem;
+      border: 1px solid rgba(255,255,255,0.5);
+      transition: all 0.2s ease;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      color: #1f2b3a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0.25rem;
+    }
+    h1 span {
+      background: #2b3b4e;
+      color: white;
+      font-size: 1rem;
+      font-weight: 400;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      letter-spacing: 0.3px;
+      margin-left: 10px;
+    }
+    .subhead {
+      font-size: 1.05rem;
+      color: #4a5b6f;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px dashed rgba(75, 100, 130, 0.2);
+    }
+    .questions-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    .question-item {
+      background: white;
+      border-radius: 1.8rem;
+      padding: 1.3rem 1.8rem 1.3rem 1.8rem;
+      box-shadow: 0 8px 18px -8px rgba(0, 30, 50, 0.15);
+      border: 1px solid rgba(255,255,255,0.7);
+      transition: transform 0.15s;
+    }
+    .question-item:hover {
+      transform: scale(1.01);
+      box-shadow: 0 10px 22px -8px rgba(30, 60, 90, 0.2);
+    }
+    .question-text {
+      font-size: 1.18rem;
+      font-weight: 540;
+      color: #1e2c3c;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .q-num {
+      background: #d9e2ef;
+      color: #1f3a5f;
+      font-size: 0.9rem;
+      font-weight: 600;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem 2.5rem;
+      margin-left: 0.5rem;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      font-size: 1.05rem;
+      color: #2b3f54;
+      padding: 0.2rem 0;
+    }
+    .option-item input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 1.3rem;
+      height: 1.3rem;
+      border: 2px solid #b3c6db;
+      border-radius: 50%;
+      margin: 0;
+      cursor: pointer;
+      transition: 0.15s;
+      position: relative;
+    }
+    .option-item input[type="radio"]:checked {
+      border-color: #2b5f8a;
+      background-color: #2b5f8a;
+      box-shadow: inset 0 0 0 4px white, 0 0 0 1px #2b5f8a;
+    }
+    .option-item input[type="radio"]:focus-visible {
+      outline: 2px solid #8db5e0;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem 1.5rem;
+      margin-top: 1rem;
+      margin-bottom: 2.2rem;
+    }
+    .btn {
+      border: none;
+      background: white;
+      padding: 0.9rem 2.4rem;
+      border-radius: 60px;
+      font-size: 1.15rem;
+      font-weight: 560;
+      color: #1e3b5c;
+      box-shadow: 0 10px 18px -10px rgba(0, 30, 60, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    .btn-primary {
+      background: #1f3b58;
+      color: white;
+      box-shadow: 0 12px 22px -12px #102433;
+    }
+    .btn-primary:hover {
+      background: #264b6e;
+      transform: translateY(-2px);
+    }
+    .btn-secondary:hover {
+      background: #ecf2fa;
+      transform: translateY(-2px);
+    }
+    .result-panel {
+      background: #ffffffc7;
+      backdrop-filter: blur(4px);
+      border-radius: 2rem;
+      padding: 1.8rem 1.8rem 1.5rem;
+      border: 1px solid white;
+      box-shadow: 0 10px 25px -12px #1e3b4e;
+    }
+    .result-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #11324d;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .type-badge {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1e3b5c, #263f57);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      margin-right: 10px;
+    }
+    .desc-text {
+      font-size: 1.05rem;
+      color: #2a3d52;
+      margin: 0.5rem 0 1rem 0;
+      line-height: 1.5;
+      background: #eef4fc;
+      padding: 1rem 1.5rem;
+      border-radius: 2rem;
+    }
+    .score-detail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.8rem;
+      background: #dde5f0;
+      padding: 0.9rem 1.5rem;
+      border-radius: 3rem;
+      font-size: 1rem;
+      color: #1b334b;
+      font-weight: 500;
+      justify-content: center;
+    }
+    .score-detail span {
+      background: #ffffffaa;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      display: inline-block;
+    }
+    .placeholder-note {
+      color: #536f88;
+      font-style: italic;
+      padding: 0.8rem 0;
+      text-align: center;
+    }
+    footer {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #6b7e95;
+      text-align: center;
+    }
+    hr {
+      border: none;
+      border-top: 2px dotted #bacddc;
+      margin: 1rem 0 0.5rem;
+    }
+    @media (max-width: 550px) {
+      .test-card { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.9rem; flex-wrap: wrap; }
+      .options { gap: 1rem; flex-direction: column; align-items: flex-start; }
+      .question-item { padding: 1.2rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="test-card">
+  <h1>
+    🔮 气质四维解码
+    <span>简易MBTI</span>
+  </h1>
+  <div class="subhead">根据第一直觉选择，共12题 · 结果仅供趣味参考</div>
+
+  <!-- 问题动态插入位置 -->
+  <div id="questionsContainer" class="questions-area"></div>
+
+  <!-- 操作按钮组 -->
+  <div class="button-group">
+    <button class="btn btn-primary" id="submitBtn">✨ 查看我的类型</button>
+    <button class="btn btn-secondary" id="resetBtn">🔄 重新选择</button>
+  </div>
+
+  <!-- 结果展示区 -->
+  <div id="resultPanel" class="result-panel">
+    <div class="result-title">
+      <span class="type-badge" id="typeCode">????</span> 
+      <span id="typeEmoji">🧩</span>
+    </div>
+    <div id="typeDescription" class="desc-text">
+      完成所有题目后点击上方按钮，你的性格类型会在这里出现。
+    </div>
+    <div id="scoreBreakdown" class="score-detail">
+      <span>E 0 : 0 I</span> <span>S 0 : 0 N</span> <span>T 0 : 0 F</span> <span>J 0 : 0 P</span>
+    </div>
+  </div>
+  <footer>⭐ 基于荣格类型理论 · 12题简化版</footer>
+</div>
+
+<script>
+  (function() {
+    // ---------- 题库数据 ----------
+    const questions = [
+      // E / I 维度 (3题)
+      { text: "在社交聚会之后，你通常感觉？", dim: "EI", options: [{ text: "精力充沛，还想继续聊", type: "E" }, { text: "有点疲惫，需要独处充电", type: "I" }] },
+      { text: "你更倾向于？", dim: "EI", options: [{ text: "边想边说，说出来才清晰", type: "E" }, { text: "深思熟虑后再表达", type: "I" }] },
+      { text: "你的朋友圈更符合？", dim: "EI", options: [{ text: "广泛交友，认识很多人", type: "E" }, { text: "深交少数挚友", type: "I" }] },
+      // S / N 维度 (3题)
+      { text: "你更关注？", dim: "SN", options: [{ text: "事实、细节、现实情况", type: "S" }, { text: "可能性、灵感、未来蓝图", type: "N" }] },
+      { text: "学习新东西时，你更喜欢？", dim: "SN", options: [{ text: "具体的案例和实践步骤", type: "S" }, { text: "抽象的理论和底层概念", type: "N" }] },
+      { text: "你更容易被什么吸引？", dim: "SN", options: [{ text: "实实在在、可触碰的事物", type: "S" }, { text: "想象、隐喻、新奇的念头", type: "N" }] },
+      // T / F 维度 (3题)
+      { text: "做重要决定时，你更多依赖？", dim: "TF", options: [{ text: "逻辑分析，客观公正", type: "T" }, { text: "个人价值观及对他人的影响", type: "F" }] },
+      { text: "你觉得自己更偏向？", dim: "TF", options: [{ text: "理智冷静，就事论事", type: "T" }, { text: "感性体贴，将心比心", type: "F" }] },
+      { text: "当朋友倾诉烦恼，你通常会？", dim: "TF", options: [{ text: "帮ta分析问题、找对策", type: "T" }, { text: "先安抚情绪，表示理解", type: "F" }] },
+      // J / P 维度 (3题)
+      { text: "对于日常生活，你更喜欢？", dim: "JP", options: [{ text: "按计划行事，条理清晰", type: "J" }, { text: "随机应变，保持弹性", type: "P" }] },
+      { text: "工作或学习上，你更像？", dim: "JP", options: [{ text: "先完成任务再放松", type: "J" }, { text: "边玩边做，灵活安排", type: "P" }] },
+      { text: "你的个人空间（书桌/房间）通常是？", dim: "JP", options: [{ text: "整洁有序，物归原处", type: "J" }, { text: "看似杂乱但自己找得到", type: "P" }] }
+    ];
+
+    // ---------- 16型人格一句话描述 (轻量版) ----------
+    const typeDescriptions = {
+      "ISTJ": "严谨务实，责任心强，逻辑清晰。传统秩序的守护者。",
+      "ISFJ": "温暖细心，善于奉献，关注他人需求。可靠的照顾者。",
+      "INFJ": "洞察力敏锐，理想主义，对意义敏感。鼓舞人心的引路人。",
+      "INTJ": "独立理性，长远规划，追求完美。战略思考者。",
+      "ISTP": "冷静实操，擅长工具，灵活应变。巧手的问题解决者。",
+      "ISFP": "温和敏感，注重和谐，艺术气质。谦逊的审美家。",
+      "INFP": "理想主义者，忠于价值观，内在丰富。治愈系梦想家。",
+      "INTP": "热爱逻辑，善于分析，抽象思考。永不疲倦的理论家。",
+      "ESTP": "精力充沛，随机应变，注重实效。行动派冒险家。",
+      "ESFP": "活泼外向，享受当下，热情洋溢。聚会的焦点。",
+      "ENFP": "热情奔放，创意无限，善于社交。快乐的探索者。",
+      "ENTP": "机智敏捷，挑战常规，能言善辩。点子大王。",
+      "ESTJ": "果断高效，善于管理，维护传统。天生的管理者。",
+      "ESFJ": "热心友善，乐于助人，责任感强。社区粘合剂。",
+      "ENFJ": "富有魅力，关心他人，善于说服。教育家型。",
+      "ENTJ": "强势果决，长远视野，天生领袖。战略指挥官。"
+    };
+
+    // 获取DOM元素
+    const container = document.getElementById('questionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const typeCodeSpan = document.getElementById('typeCode');
+    const typeEmojiSpan = document.getElementById('typeEmoji');
+    const typeDescDiv = document.getElementById('typeDescription');
+    const scoreDiv = document.getElementById('scoreBreakdown');
+
+    // ---------- 渲染题目 ----------
+    function renderQuestions() {
+      let htmlStr = '';
+      questions.forEach((q, idx) => {
+        htmlStr += `
+          <div class="question-item">
+            <div class="question-text">
+              <span class="q-num">${idx+1}</span> ${q.text}
+            </div>
+            <div class="options">
+        `;
+        q.options.forEach((opt, optIdx) => {
+          const radioId = `q${idx}_${optIdx}`;
+          htmlStr += `
+            <label class="option-item" for="${radioId}">
+              <input type="radio" name="q${idx}" id="${radioId}" value="${opt.type}">
+              <span>${opt.text}</span>
+            </label>
+          `;
+        });
+        htmlStr += `</div></div>`;
+      });
+      container.innerHTML = htmlStr;
+    }
+
+    // ---------- 重置所有选项 + 恢复占位结果 ----------
+    function resetAll() {
+      // 清除所有radio选中
+      const allRadios = document.querySelectorAll('input[type="radio"]');
+      allRadios.forEach(radio => radio.checked = false);
+
+      // 恢复结果区域为初始状态
+      typeCodeSpan.textContent = '????';
+      typeEmojiSpan.textContent = '🧩';
+      typeDescDiv.textContent = '完成所有题目后点击上方按钮，你的性格类型会在这里出现。';
+      scoreDiv.innerHTML = `<span>E 0 : 0 I</span> <span>S 0 : 0 N</span> <span>T 0 : 0 F</span> <span>J 0 : 0 P</span>`;
+    }
+
+    // ---------- 检查是否所有题目都已答完 ----------
+    function allQuestionsAnswered() {
+      for (let i = 0; i < questions.length; i++) {
+        const radioGroup = document.getElementsByName(`q${i}`);
+        if (!radioGroup || radioGroup.length === 0) return false;
+        const checkedExists = Array.from(radioGroup).some(r => r.checked);
+        if (!checkedExists) return false;
+      }
+      return true;
+    }
+
+    // ---------- 统计得分，返回各类型计数和四字母代码 ----------
+    function calculateType() {
+      // 初始化计数器
+      const count = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+
+      for (let i = 0; i < questions.length; i++) {
+        const radioGroup = document.getElementsByName(`q${i}`);
+        const selected = Array.from(radioGroup).find(r => r.checked);
+        if (selected) {
+          const val = selected.value;  // 大写字母 E I S N T F J P
+          if (count.hasOwnProperty(val)) count[val] += 1;
+        }
+      }
+
+      // 四个维度结果 (由于每个维度3题，不会出现相等。但保留 >= 逻辑，相等时取后者: I, N, F, P)
+      const first = count.E > count.I ? 'E' : 'I';      // EI
+      const second = count.S > count.N ? 'S' : 'N';     // SN
+      const third = count.T > count.F ? 'T' : 'F';      // TF
+      const fourth = count.J > count.P ? 'J' : 'P';     // JP
+      const type = first + second + third + fourth;
+
+      return { count, type };
+    }
+
+    // ---------- 更新结果界面 (得分, 类型, 描述, 表情) ----------
+    function updateResultPanel() {
+      if (!allQuestionsAnswered()) {
+        alert('🌸 还有题目没有选择，请完成所有题目再提交哦～');
+        return;
+      }
+
+      const { count, type } = calculateType();
+
+      // 更新类型代码
+      typeCodeSpan.textContent = type;
+
+      // 简单emoji根据首字母搭配
+      const emojiMap = {
+        'ISTJ':'📋', 'ISFJ':'🤝', 'INFJ':'🔮', 'INTJ':'⚙️',
+        'ISTP':'🔧', 'ISFP':'🎨', 'INFP':'📖', 'INTP':'💡',
+        'ESTP':'🎯', 'ESFP':'🎉', 'ENFP':'🌈', 'ENTP':'⚡',
+        'ESTJ':'📌', 'ESFJ':'💬', 'ENFJ':'🌟', 'ENTJ':'🚀'
+      };
+      typeEmojiSpan.textContent = emojiMap[type] || '🧩';
+
+      // 描述文字 (如果不存在则通用)
+      const desc = typeDescriptions[type] || '你的个性独特，难以被简单定义。继续探索吧。';
+      typeDescDiv.textContent = desc;
+
+      // 得分详情
+      scoreDiv.innerHTML = `
+        <span>E ${count.E} : ${count.I} I</span>
+        <span>S ${count.S} : ${count.N} N</span>
+        <span>T ${count.T} : ${count.F} F</span>
+        <span>J ${count.J} : ${count.P} P</span>
+      `;
+    }
+
+    // ---------- 事件绑定 ----------
+    submitBtn.addEventListener('click', updateResultPanel);
+
+    resetBtn.addEventListener('click', function() {
+      resetAll();
+    });
+
+    // 初始化渲染题目，并且重置为无选中状态
+    renderQuestions();
+    resetAll();  // 确保初始没有任何选中，且结果占位
+
+    // 可选：点击题目后自动轻微效果，无额外逻辑
+  })();
+</script>
+</body>
+</html>
